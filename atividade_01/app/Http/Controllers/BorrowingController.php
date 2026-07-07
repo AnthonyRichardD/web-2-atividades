@@ -17,6 +17,10 @@ class BorrowingController extends Controller
 
         $this->authorize('create', [Borrowing::class, (int) $request->user_id]);
 
+        if ($book->borrowings()->whereNull('returned_at')->exists()) {
+            return back()->withErrors(['book' => 'Este livro já possui um empréstimo em aberto.']);
+        }
+
         Borrowing::create([
             'user_id' => $request->user_id,
             'book_id' => $book->id,

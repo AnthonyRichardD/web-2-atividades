@@ -28,8 +28,9 @@ class BookController extends Controller
         $book->load(['author', 'publisher', 'category']);
 
         $users = User::all();
+        $hasOpenBorrowing = $book->borrowings()->whereNull('returned_at')->exists();
 
-        return view('books.show', compact('book', 'users'));
+        return view('books.show', compact('book', 'users', 'hasOpenBorrowing'));
     }
 
     public function edit(Book $book)
