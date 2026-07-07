@@ -36,4 +36,24 @@ class User extends Authenticatable
             ->withPivot('id', 'borrowed_at', 'returned_at')
             ->withTimestamps();
     }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isBibliotecario(): bool
+    {
+        return $this->role === 'bibliotecario';
+    }
+
+    public function isCliente(): bool
+    {
+        return $this->role === 'cliente';
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->isAdmin() || $this->isBibliotecario();
+    }
 }

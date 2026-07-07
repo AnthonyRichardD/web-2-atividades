@@ -11,6 +11,11 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Book::class, 'book');
+    }
+
     public function index()
     {
         $books = Book::with('author')->paginate(20);
@@ -53,12 +58,16 @@ class BookController extends Controller
     // Formulário com input de ID
     public function createWithId()
     {
+        $this->authorize('create', Book::class);
+
         return view('books.create-id');
     }
 
     // Salvar livro com input de ID
     public function storeWithId(Request $request)
     {
+        $this->authorize('create', Book::class);
+
         $request->validate([
             'title' => 'required|string|max:255',
             'publisher_id' => 'required|exists:publishers,id',
@@ -74,6 +83,8 @@ class BookController extends Controller
     // Formulário com input select
     public function createWithSelect()
     {
+        $this->authorize('create', Book::class);
+
         $publishers = Publisher::all();
         $authors = Author::all();
         $categories = Category::all();
@@ -84,6 +95,8 @@ class BookController extends Controller
     // Salvar livro com input select
     public function storeWithSelect(Request $request)
     {
+        $this->authorize('create', Book::class);
+
         $request->validate([
             'title' => 'required|string|max:255',
             'publisher_id' => 'required|exists:publishers,id',
@@ -94,6 +107,13 @@ class BookController extends Controller
         Book::create($request->all());
 
         return redirect()->route('books.index')->with('success', 'Livro criado com sucesso.');
+    }
+
+    public function destroy(Book $book)
+    {
+        $book->delete();
+
+        return redirect()->route('books.index')->with('success', 'Livro excluído com sucesso.');
     }
 }
 

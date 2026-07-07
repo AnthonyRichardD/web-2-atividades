@@ -7,6 +7,11 @@ use App\Models\User;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(User::class, 'user');
+    }
+
     public function index()
     {
         $users = User::paginate(10);
@@ -25,7 +30,19 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $user->update($request->only('name', 'email'));
+        $data = $request->only('name', 'email');
+
+        if ($request->has('role')) {
+            $this->authorize('updateRole', [$user, $request->input('role')]);
+
+            $request->validate([
+                'role' => 'required|in:admin,bibliotecario,cliente',
+            ]);
+
+            $data['role'] = $request->input('role');
+        }
+
+        $user->update($data);
 
         return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso.');
     }

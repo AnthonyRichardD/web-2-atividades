@@ -15,6 +15,8 @@ class BorrowingController extends Controller
             'user_id' => 'required|exists:users,id',
         ]);
 
+        $this->authorize('create', [Borrowing::class, (int) $request->user_id]);
+
         Borrowing::create([
             'user_id' => $request->user_id,
             'book_id' => $book->id,
@@ -26,6 +28,8 @@ class BorrowingController extends Controller
 
     public function userBorrowings(User $user)
     {
+        $this->authorize('viewBorrowings', $user);
+
         $borrowings = $user->books()->withPivot('borrowed_at', 'returned_at')->get();
 
         return view('users.borrowings', compact('user', 'borrowings'));
@@ -33,6 +37,8 @@ class BorrowingController extends Controller
 
     public function returnBook(Borrowing $borrowing)
     {
+        $this->authorize('returnBook', $borrowing);
+
         $borrowing->update([
             'returned_at' => now(),
         ]);
