@@ -21,6 +21,12 @@ class BorrowingController extends Controller
             return back()->withErrors(['book' => 'Este livro já possui um empréstimo em aberto.']);
         }
 
+        $user = User::findOrFail($request->user_id);
+
+        if ($user->hasReachedBorrowingLimit()) {
+            return back()->withErrors(['book' => 'Este usuário já possui ' . User::MAX_ACTIVE_BORROWINGS . ' empréstimos em aberto e atingiu o limite permitido.']);
+        }
+
         Borrowing::create([
             'user_id' => $request->user_id,
             'book_id' => $book->id,

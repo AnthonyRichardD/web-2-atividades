@@ -56,4 +56,16 @@ class User extends Authenticatable
     {
         return $this->isAdmin() || $this->isBibliotecario();
     }
+
+    public const MAX_ACTIVE_BORROWINGS = 5;
+
+    public function activeBorrowingsCount(): int
+    {
+        return $this->books()->wherePivotNull('returned_at')->count();
+    }
+
+    public function hasReachedBorrowingLimit(): bool
+    {
+        return $this->activeBorrowingsCount() >= self::MAX_ACTIVE_BORROWINGS;
+    }
 }
