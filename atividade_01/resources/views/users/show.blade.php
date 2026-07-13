@@ -10,6 +10,25 @@
         </div>
         <div class="card-body">
             <p><strong>Email:</strong> {{ $user->email }}</p>
+            <p>
+                <strong>Débito:</strong>
+                @if($user->hasDebt())
+                    <span class="badge bg-danger">R$ {{ number_format($user->debit, 2, ',', '.') }}</span>
+                @else
+                    <span class="badge bg-success">Sem débito</span>
+                @endif
+            </p>
+            @can('clearDebit', $user)
+                @if($user->hasDebt())
+                    <form action="{{ route('users.clear-debit', $user) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <button class="btn btn-warning btn-sm" onclick="return confirm('Confirma o recebimento do pagamento e zerar o débito?')">
+                            <i class="bi bi-cash"></i> Zerar Débito
+                        </button>
+                    </form>
+                @endif
+            @endcan
         </div>
     </div>
 
@@ -26,6 +45,7 @@
                             <th>Livro</th>
                             <th>Data de Empréstimo</th>
                             <th>Data de Devolução</th>
+                            <th>Multa</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -39,6 +59,7 @@
                                 </td>
                                 <td>{{ $book->pivot->borrowed_at }}</td>
                                 <td>{{ $book->pivot->returned_at ?? 'Em Aberto' }}</td>
+                                <td>{{ $book->pivot->fine > 0 ? 'R$ ' . number_format($book->pivot->fine, 2, ',', '.') : '-' }}</td>
                                 <td>
                                     @if(is_null($book->pivot->returned_at))
                                         <form action="{{ route('borrowings.return', $book->pivot->id) }}" method="POST">

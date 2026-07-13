@@ -28,10 +28,12 @@ class BookController extends Controller
     {
         $book->load(['author', 'publisher', 'category']);
 
-        $users = User::all();
+        $authUser = auth()->user();
+        $users = $authUser->isStaff() ? User::all() : collect();
         $hasOpenBorrowing = $book->borrowings()->whereNull('returned_at')->exists();
+        $canBorrow = $authUser->isStaff() || (!$authUser->hasDebt() && !$authUser->hasReachedBorrowingLimit());
 
-        return view('books.show', compact('book', 'users', 'hasOpenBorrowing'));
+        return view('books.show', compact('book', 'users', 'hasOpenBorrowing', 'canBorrow'));
     }
 
     public function edit(Book $book)
@@ -141,4 +143,3 @@ class BookController extends Controller
         return redirect()->route('books.index')->with('success', 'Livro excluído com sucesso.');
     }
 }
-

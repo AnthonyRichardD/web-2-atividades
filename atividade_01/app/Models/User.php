@@ -33,7 +33,7 @@ class User extends Authenticatable
     public function books()
     {
         return $this->belongsToMany(Book::class, 'borrowings')
-            ->withPivot('id', 'borrowed_at', 'returned_at')
+            ->withPivot('id', 'borrowed_at', 'returned_at', 'fine')
             ->withTimestamps();
     }
 
@@ -67,5 +67,10 @@ class User extends Authenticatable
     public function hasReachedBorrowingLimit(): bool
     {
         return $this->activeBorrowingsCount() >= self::MAX_ACTIVE_BORROWINGS;
+    }
+
+    public function hasDebt(): bool
+    {
+        return $this->debit > 0;
     }
 }

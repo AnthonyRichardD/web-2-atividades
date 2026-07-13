@@ -19,6 +19,7 @@
                     <th>Livro</th>
                     <th>Data de Empréstimo</th>
                     <th>Data de Devolução</th>
+                    <th>Multa</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -32,6 +33,7 @@
                         </td>
                         <td>{{ $book->pivot->borrowed_at }}</td>
                         <td>{{ $book->pivot->returned_at ?? 'Em Aberto' }}</td>
+                        <td>{{ $book->pivot->fine > 0 ? 'R$ ' . number_format($book->pivot->fine, 2, ',', '.') : '-' }}</td>
                         <td>
                             @if(is_null($book->pivot->returned_at))
                                 <form action="{{ route('borrowings.return', $book->pivot->id) }}" method="POST">

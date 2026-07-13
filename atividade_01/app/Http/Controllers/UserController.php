@@ -46,4 +46,14 @@ class UserController extends Controller
 
         return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso.');
     }
+
+    public function clearDebit(User $user)
+    {
+        $this->authorize('clearDebit', $user);
+
+        $user->debit = 0;
+        $user->save();
+
+        return back()->with('success', "Débito de {$user->name} zerado com sucesso.");
+    }
 }

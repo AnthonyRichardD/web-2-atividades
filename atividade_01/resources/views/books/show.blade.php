@@ -30,18 +30,28 @@
 
             @if($hasOpenBorrowing)
                 <p class="mb-0">Este livro já possui um empréstimo em aberto. Aguarde a devolução para registrar um novo.</p>
+            @elseif(!$canBorrow)
+                @if(auth()->user()->hasDebt())
+                    <p class="mb-0">Você possui débito pendente e não pode realizar novos empréstimos. Procure um bibliotecário para regularizar.</p>
+                @else
+                    <p class="mb-0">Você atingiu o limite de {{ \App\Models\User::MAX_ACTIVE_BORROWINGS }} empréstimos simultâneos.</p>
+                @endif
             @else
                 <form action="{{ route('books.borrow', $book) }}" method="POST">
                     @csrf
-                    <div class="mb-3">
-                        <label for="user_id" class="form-label">Usuário</label>
-                        <select class="form-select" id="user_id" name="user_id" required>
-                            <option value="" selected>Selecione um usuário</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    @if(auth()->user()->isStaff())
+                        <div class="mb-3">
+                            <label for="user_id" class="form-label">Usuário</label>
+                            <select class="form-select" id="user_id" name="user_id" required>
+                                <option value="" selected>Selecione um usuário</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @else
+                        <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+                    @endif
                     <button type="submit" class="btn btn-success">Registrar Empréstimo</button>
                 </form>
             @endif
@@ -61,6 +71,7 @@
                             <th>Usuário</th>
                             <th>Data de Empréstimo</th>
                             <th>Data de Devolução</th>
+                            <th>Multa</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -74,6 +85,7 @@
                                 </td>
                                 <td>{{ $user->pivot->borrowed_at }}</td>
                                 <td>{{ $user->pivot->returned_at ?? 'Em Aberto' }}</td>
+                                <td>{{ $user->pivot->fine > 0 ? 'R$ ' . number_format($user->pivot->fine, 2, ',', '.') : '-' }}</td>
                                 <td>
                                     @if(is_null($user->pivot->returned_at))
                                         <form action="{{ route('borrowings.return', $user->pivot->id) }}" method="POST">

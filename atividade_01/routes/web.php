@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('books', BookController::class)->except(['create', 'store']);
 
     Route::resource('users', UserController::class)->except(['create', 'store', 'destroy']);
+    Route::patch('/users/{user}/clear-debit', [UserController::class, 'clearDebit'])->name('users.clear-debit');
 
     Route::post('/books/{book}/borrow', [BorrowingController::class, 'store'])->name('books.borrow');
     Route::get('/users/{user}/borrowings', [BorrowingController::class, 'userBorrowings'])->name('users.borrowings');

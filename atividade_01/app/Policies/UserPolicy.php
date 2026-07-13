@@ -45,4 +45,12 @@ class UserPolicy
     {
         return $user->isStaff() || $user->is($target);
     }
+
+    /**
+     * Determine whether the user can clear the target's debit.
+     */
+    public function clearDebit(User $user, User $target): bool
+    {
+        return $user->isStaff();
+    }
 }
