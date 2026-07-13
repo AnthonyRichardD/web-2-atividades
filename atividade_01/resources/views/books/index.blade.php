@@ -22,6 +22,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>Capa</th>
                 <th>ID</th>
                 <th>Título</th>
                 <th>Autor</th>
@@ -31,6 +32,9 @@
         <tbody>
             @forelse($books as $book)
                 <tr>
+                    <td>
+                        <img src="{{ $book->cover_image ? asset('storage/' . $book->cover_image) : asset('images/default-cover.png') }}" alt="Capa do Livro" style="height: 60px;">
+                    </td>
                     <td>{{ $book->id }}</td>
                     <td>{{ $book->title }}</td>
                     <td>{{ $book->author->name }}</td>
@@ -61,7 +65,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4">Nenhum livro encontrado.</td>
+                    <td colspan="5">Nenhum livro encontrado.</td>
                 </tr>
             @endforelse
         </tbody>
